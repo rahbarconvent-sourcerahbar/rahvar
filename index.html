@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f1f3f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .calculator {
+      width: 360px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .display {
+      padding: 20px;
+      text-align: right;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .display input {
+      width: 100%;
+      border: none;
+      font-size: 32px;
+      outline: none;
+      text-align: right;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    button {
+      padding: 20px;
+      font-size: 18px;
+      border: 1px solid #eee;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e8eaed;
+    }
+
+    .operator {
+      color: #1a73e8;
+      font-weight: bold;
+    }
+
+    .equal {
+      background: #1a73e8;
+      color: #fff;
+      grid-column: span 2;
+    }
+
+    .equal:hover {
+      background: #1669c1;
+    }
+
+    .history {
+      background: #f8f9fa;
+      padding: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .history h4 {
+      margin: 0 0 5px;
+    }
+
+    .history-item {
+      color: #555;
+    }
+
+    .clear-history {
+      color: #1a73e8;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="display">
+    <input type="text" id="display" readonly />
+  </div>
+
+  <div class="history">
+    <h4>History</h4>
+    <div id="historyList"></div>
+    <div class="clear-history" onclick="clearHistory()">Clear History</div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="clearDisplay()">C</button>
+    <button onclick="append('%')" class="operator">%</button>
+    <button onclick="append('/')" class="operator">÷</button>
+    <button onclick="append('*')" class="operator">×</button>
+
+    <button onclick="append('7')">7</button>
+    <button onclick="append('8')">8</button>
+    <button onclick="append('9')">9</button>
+    <button onclick="append('-')" class="operator">−</button>
+
+    <button onclick="append('4')">4</button>
+    <button onclick="append('5')">5</button>
+    <button onclick="append('6')">6</button>
+    <button onclick="append('+')" class="operator">+</button>
+
+    <button onclick="append('1')">1</button>
+    <button onclick="append('2')">2</button>
+    <button onclick="append('3')">3</button>
+    <button onclick="calculate()" class="equal">=</button>
+
+    <button onclick="append('0')">0</button>
+    <button onclick="append('.')">.</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById("display");
+  const historyList = document.getElementById("historyList");
+
+  function append(value) {
+    display.value += value;
+  }
+
+  function clearDisplay() {
+    display.value = "";
+  }
+
+  function calculate() {
+    try {
+      const expression = display.value;
+      const result = eval(expression);
+      saveHistory(expression + " = " + result);
+      display.value = result;
+    } catch {
+      display.value = "Error";
+    }
+  }
+
+  function saveHistory(entry) {
+    let history = JSON.parse(localStorage.getItem("calcHistory")) || [];
+    history.unshift(entry);
+    history = history.slice(0, 10); // keep last 10
+    localStorage.setItem("calcHistory", JSON.stringify(history));
+    loadHistory();
+  }
+
+  function loadHistory() {
+    historyList.innerHTML = "";
+    const history = JSON.parse(localStorage.getItem("calcHistory")) || [];
+    history.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "history-item";
+      div.textContent = item;
+      historyList.appendChild(div);
+    });
+  }
+
+  function clearHistory() {
+    localStorage.removeItem("calcHistory");
+    loadHistory();
+  }
+
+  loadHistory();
+</script>
+
+</body>
+</html>
